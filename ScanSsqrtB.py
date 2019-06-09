@@ -12,7 +12,7 @@ from array import array
 from ROOT import TGraph2D
 
 if len(sys.argv) < 3:
-	print " Usage: python examples/analysis.py inputBg.root inputSg.root output.root"
+	print " Usage: python examples/analysis.py inputBg.root inputSg.root output.root testmass"
 	sys.exit(1)
 
 ROOT.gSystem.Load("libDelphes")
@@ -27,6 +27,7 @@ except:
 BgFile = sys.argv[1] #background file
 SgFile = sys.argv[2] #signal file
 outputFile = sys.argv[3]
+test_testmass = sys.argv[4]
 
 # Create chain of root trees
 Bgchain = ROOT.TChain("Delphes")
@@ -59,8 +60,8 @@ SgbranchTrack = SgtreeReader.UseBranch("Track")
 
 #testmass for ass3l()
 global testmass
-testmass = 80
-
+#testmass = 80
+testmass = float(test_testmass)
 #ecm
 global ecm
 ecm = 45.8*2 #GeV
@@ -206,7 +207,8 @@ def funcshisto():
 	histSgdeltar = ROOT.TH1F("Sg_DeltaR", "Sg_DeltaR", 100, 0., 10.)
 	histSgMALP = ROOT.TH1F("Sg_MALP", "Sg", 100, 0., 100.)
 	histSgMALPcut = ROOT.TH1F("Sg_MALPcut", "Sg", 100, 0., 50.)
-	histSgEphoDR = ROOT.TH2F("Sg", "Sg", 100, 0.65, 1.1, 100, 2., 6.)
+	histSgEphoDR = ROOT.TH2F("Sg", "Sg", 100, 0.0, 1.1, 100, 0., 6.)
+	histSgEphoMalp = ROOT.TH2F("Sg_2","Sg_2", 100, -4, 4, 100, -5, 5)
 		
 	# Loop over signal events
 	for entry in range(0, SgnumberOfEntries):
@@ -256,12 +258,14 @@ def funcshisto():
 		
 		MALPcut = ((MALP-testmass)**2/(sigmaalp**2)+(epho3-ephotest)**2/(sigmaepho3**2))**0.5
 		
+		histSgEphoMalp.Fill((epho3-ephotest)/sigmaepho3, (MALP-testmass)/sigmaalp )
 		histSgepho2epho1.Fill(epho2epho1)
 		histSgdeltar.Fill(Sg_DeltaR)
 		histSgMALP.Fill(MALP)
 		histSgMALPcut.Fill(MALPcut)
 		histSgEphoDR.Fill(epho2epho1, Sg_DeltaR)
 
+	histSgEphoMalp.Write()
 	histSgepho2epho1.Write()
 	histSgdeltar.Write()
 	histSgMALP.Write()
@@ -273,7 +277,8 @@ def funcbhisto():
 	histBgdeltar = ROOT.TH1F("Bg_DeltaR", "Bg_DeltaR", 100, 0., 10.)
 	histBgMALP = ROOT.TH1F("Bg_MALP", "Bg", 100, 0., 100.)
 	histBgMALPcut = ROOT.TH1F("Bg_MALPcut", "Bg", 100, 0., 50.)
-	histBgEphoDR = ROOT.TH2F("Bg", "Bg", 100, 0.65, 1.1, 100, 2., 6.)
+	histBgEphoDR = ROOT.TH2F("Bg", "Bg", 100, 0.00, 1.1, 100, 0., 6.)
+	histBgEphoMalp = ROOT.TH2F("Bg_2","Bg_2", 100, -70, 35, 100, -90, 60)
 	# Loop over signal events
 	for entry in range(0, BgnumberOfEntries):
 		# Load selected branches with data from specified event
@@ -321,13 +326,15 @@ def funcbhisto():
 		Bg_DeltaR = threephotons_vec[ipalp1].DeltaR(threephotons_vec[ipalp2])
 		
 		MALPcut = ((MALP-testmass)**2/(sigmaalp**2)+(epho3-ephotest)**2/(sigmaepho3)**2)**0.5
-		
+		#print (epho3-ephotest)/sigmaepho3, (MALP-testmass)/sigmaalp
+		histBgEphoMalp.Fill((epho3-ephotest)/sigmaepho3, (MALP-testmass)/sigmaalp )
 		histBgepho2epho1.Fill(epho2epho1)
 		histBgdeltar.Fill(Bg_DeltaR)
 		histBgMALP.Fill(MALP)
 		histBgMALPcut.Fill(MALPcut)
 		histBgEphoDR.Fill(epho2epho1, Bg_DeltaR)
 
+	histBgEphoMalp.Write()
 	histBgepho2epho1.Write()
 	histBgdeltar.Write()
 	histBgMALP.Write()
