@@ -68,12 +68,12 @@ ecm = 45.8*2 #GeV
 
 #cross-section to rescale graphs
 #xsec scanalp90_80 eta=10 = 3.294275e-06 pb
-global xsec_scanalp90_80_eta10
+global xsec_scanalp90_60_eta10
 global xsec_3abg90_eta10
 global luminosity
 
 #xsec10 = [0.0002380292, 0.0002127458, 0.0001752995, 0.0001306328, 8.530332e-05, 4.596179e-05, 1.775303e-05, 3.294275e-06]
-xsec_scanalp90_80_eta10 = 3.294275 #ab #from lorenzo/alp/lorenzo/xsectocyy.py
+xsec_scanalp90_60_eta10 = 45.96179 #ab #from lorenzo/alp/lorenzo/xsectocyy.py
 xsec_3abg90_eta10 = 2.8882e06 #ab #from polesell/work/alpbg/fcc3a/Events/3abf_90_1
 luminosity = 150 #ab^-1
 
@@ -132,7 +132,7 @@ def funcs(cutDR, cutEpho):
 		
 		Sg_DeltaR = threephotons_vec[ipalp1].DeltaR(threephotons_vec[ipalp2])
 			
-		if MALPcut < 1.5 and Sg_DeltaR < 3.14 and (epho2epho1<0.85 or Sg_DeltaR<3.05):
+		if MALPcut < 1.5 and epho2epho1>0.7:
 			s_counter = s_counter+1
 		
 	#print s_counter
@@ -188,7 +188,7 @@ def funcb(cutDR, cutEpho):
 	
 		Bg_DeltaR = threephotons_vec[ipalp1].DeltaR(threephotons_vec[ipalp2])
 	
-		if MALPcut < 1.5 and Bg_DeltaR < 3.14 and (epho2epho1<0.85 or Bg_DeltaR<3.05):
+		if MALPcut < 1.5 and epho2epho1>0.7:
 			b_counter = b_counter+1
 		
 	#print b_counter
@@ -197,7 +197,7 @@ def funcb(cutDR, cutEpho):
 def funcssqrtb(cutDR, cutEpho):
 	s = funcs(cutDR, cutEpho)
 	b = funcb(cutDR, cutEpho)
-	s1 = s*xsec_scanalp90_80_eta10*luminosity/SgnumberOfEntries
+	s1 = s*xsec_scanalp90_60_eta10*luminosity/SgnumberOfEntries
 	b1 = b*xsec_3abg90_eta10*luminosity/BgnumberOfEntries
 	print str(cutDR)+"  "+str(cutEpho)+"  "+str(s)+"  "+str(b)+"  "+str(s1)+"  "+str(b1)+"  "+str(s1/(b1**0.5))+"\n"
 	return s,b,s1/(b1**0.5)  
