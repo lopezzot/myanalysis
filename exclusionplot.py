@@ -1,4 +1,4 @@
-from ROOT import TGraph, TFile
+from ROOT import TGraph, TFile, TCanvas
 from array import array
 
 coupligs = array('d')
@@ -17,18 +17,37 @@ for x in m:
 for y in t:
 	theoretical.append(y)
 
+canvas=TCanvas("canvas","canvas",800,800)
+canvas.SetLogy()
+canvas.SetLogx()
 Exclusiongraph = TGraph(len(m), masses, coupligs)
 Exclusiongraph.GetHistogram().SetMaximum(2000.)
 Exclusiongraph.GetHistogram().SetMinimum(0.1e-6)
 XAxis = Exclusiongraph.GetXaxis()
 XAxis.SetLimits(1.e-15,2000)
 
+
 Exclusiongraph2 = TGraph(len(m), masses, theoretical)
+Exclusiongraph2.SetTitle("")
 Exclusiongraph2.GetHistogram().SetMaximum(2000.)
 Exclusiongraph2.GetHistogram().SetMinimum(0.1e-6)
 XAxis = Exclusiongraph2.GetXaxis()
 XAxis.SetLimits(1.e-15,2000)
-
+XAxis.SetNdivisions(105)
+XAxis.SetTitle("M_{a} [GeV]")
+XAxis.SetTitleOffset(1.5)
+YAxis = Exclusiongraph2.GetYaxis()
+YAxis.SetNdivisions(105)
+YAxis.SetTitle("c")
+Exclusiongraph.SetFillColorAlpha(7, 0.5)
+Exclusiongraph.SetLineColor(7)
+Exclusiongraph.SetLineWidth(3)
+Exclusiongraph2.SetFillColorAlpha(6, 0.5)
+Exclusiongraph2.SetLineColor(6)
+Exclusiongraph2.SetLineWidth(3)
+Exclusiongraph2.Draw("afl")
+Exclusiongraph.Draw("same fl")
 
 Exclusiongraph.Write()
 Exclusiongraph2.Write()
+canvas.SaveAs("canvas.pdf")
