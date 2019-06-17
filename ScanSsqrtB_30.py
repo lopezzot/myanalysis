@@ -210,7 +210,8 @@ def funcshisto():
 	histSgMALPcut = ROOT.TH1F("Sg_MALPcut", "Sg", 100, 0., 50.)
 	histSgEphoDR = ROOT.TH2F("Sg", "Sg", 100, 0.0, 1.1, 100, 0., 6.)
 	histSgEphoMalp = ROOT.TH2F("Sg_2","Sg_2", 100, -4, 4, 100, -5, 5)
-		
+	histSgEphoDR_afterMALPcut = ROOT.TH2F("Sg_afterMALPcut", "Sg_afterMALPcut", 100, 0.0, 1.1, 100, 0.0, 6.0)
+	
 	# Loop over signal events
 	for entry in range(0, SgnumberOfEntries):
 		# Load selected branches with data from specified event
@@ -265,7 +266,10 @@ def funcshisto():
 		histSgMALP.Fill(MALP)
 		histSgMALPcut.Fill(MALPcut)
 		histSgEphoDR.Fill(epho2epho1, Sg_DeltaR)
+		if MALPcut<1.5:
+			histSgEphoDR_afterMALPcut.Fill(epho2epho1, Sg_DeltaR)
 
+	histSgEphoDR_afterMALPcut.Write()
 	histSgEphoMalp.Write()
 	histSgepho2epho1.Write()
 	histSgdeltar.Write()
@@ -280,6 +284,8 @@ def funcbhisto():
 	histBgMALPcut = ROOT.TH1F("Bg_MALPcut", "Bg", 100, 0., 50.)
 	histBgEphoDR = ROOT.TH2F("Bg", "Bg", 100, 0.00, 1.1, 100, 0., 6.)
 	histBgEphoMalp = ROOT.TH2F("Bg_2","Bg_2", 100, -70, 35, 100, -90, 60)
+	histBgEphoDR_afterMALPcut = ROOT.TH2F("Bg_afterMALPcut", "Bg_afterMALPcut", 100, 0.0, 1.1, 100, 0., 6.)
+
 	# Loop over signal events
 	for entry in range(0, BgnumberOfEntries):
 		# Load selected branches with data from specified event
@@ -334,7 +340,10 @@ def funcbhisto():
 		histBgMALP.Fill(MALP)
 		histBgMALPcut.Fill(MALPcut)
 		histBgEphoDR.Fill(epho2epho1, Bg_DeltaR)
+		if MALPcut<1.5:
+			histBgEphoDR_afterMALPcut.Fill(epho2epho1, Bg_DeltaR)
 
+	histBgEphoDR_afterMALPcut.Write()
 	histBgEphoMalp.Write()
 	histBgepho2epho1.Write()
 	histBgdeltar.Write()

@@ -73,7 +73,7 @@ global xsec_3abg90_eta10
 global luminosity
 
 #xsec10 = [0.0002380292, 0.0002127458, 0.0001752995, 0.0001306328, 8.530332e-05, 4.596179e-05, 1.775303e-05, 3.294275e-06]
-xsec_scanalp90_80_eta10 = 17.75303 #ab #from lorenzo/alp/lorenzo/xsectocyy.py
+xsec_scanalp90_70_eta10 = 17.75303 #ab #from lorenzo/alp/lorenzo/xsectocyy.py
 xsec_3abg90_eta10 = 2.8882e06 #ab #from polesell/work/alpbg/fcc3a/Events/3abf_90_1
 luminosity = 150 #ab^-1
 
@@ -132,7 +132,7 @@ def funcs(cutDR, cutEpho):
 		
 		Sg_DeltaR = threephotons_vec[ipalp1].DeltaR(threephotons_vec[ipalp2])
 			
-		if MALPcut < 1.5 and Sg_DeltaR < 3.14 and (epho2epho1<0.85 or Sg_DeltaR<3.05):
+		if MALPcut < 1.5 and Sg_DeltaR < 3.14 and (epho2epho1<0.75 or Sg_DeltaR<3.05):
 			s_counter = s_counter+1
 		
 	#print s_counter
@@ -188,7 +188,7 @@ def funcb(cutDR, cutEpho):
 	
 		Bg_DeltaR = threephotons_vec[ipalp1].DeltaR(threephotons_vec[ipalp2])
 	
-		if MALPcut < 1.5 and Bg_DeltaR < 3.14 and (epho2epho1<0.85 or Bg_DeltaR<3.05):
+		if MALPcut < 1.5 and Bg_DeltaR < 3.14 and (epho2epho1<0.75 or Bg_DeltaR<3.05):
 			b_counter = b_counter+1
 		
 	#print b_counter
@@ -197,7 +197,7 @@ def funcb(cutDR, cutEpho):
 def funcssqrtb(cutDR, cutEpho):
 	s = funcs(cutDR, cutEpho)
 	b = funcb(cutDR, cutEpho)
-	s1 = s*xsec_scanalp90_80_eta10*luminosity/SgnumberOfEntries
+	s1 = s*xsec_scanalp90_70_eta10*luminosity/SgnumberOfEntries
 	b1 = b*xsec_3abg90_eta10*luminosity/BgnumberOfEntries
 	print str(cutDR)+"  "+str(cutEpho)+"  "+str(s)+"  "+str(b)+"  "+str(s1)+"  "+str(b1)+"  "+str(s1/(b1**0.5))+"\n"
 	return s,b,s1/(b1**0.5)  
@@ -210,7 +210,8 @@ def funcshisto():
 	histSgMALPcut = ROOT.TH1F("Sg_MALPcut", "Sg", 100, 0., 50.)
 	histSgEphoDR = ROOT.TH2F("Sg", "Sg", 100, 0.0, 1.1, 100, 0., 6.)
 	histSgEphoMalp = ROOT.TH2F("Sg_2","Sg_2", 100, -4, 4, 100, -5, 5)
-		
+	histSgEPhoDR_afterMALPcut = ROOT.TH2F("Sg_afterMALPcut", "Sg_afterMALPcut", 100, 0.0, 1.1, 100, 0., 6.)
+
 	# Loop over signal events
 	for entry in range(0, SgnumberOfEntries):
 		# Load selected branches with data from specified event
@@ -265,7 +266,10 @@ def funcshisto():
 		histSgMALP.Fill(MALP)
 		histSgMALPcut.Fill(MALPcut)
 		histSgEphoDR.Fill(epho2epho1, Sg_DeltaR)
-
+		if MALPcut<1.5:
+			histSgEPhoDR_afterMALPcut.Fill(epho2epho1, Sg_DeltaR)
+	
+	histSgEPhoDR_afterMALPcut.Write()
 	histSgEphoMalp.Write()
 	histSgepho2epho1.Write()
 	histSgdeltar.Write()
@@ -280,6 +284,8 @@ def funcbhisto():
 	histBgMALPcut = ROOT.TH1F("Bg_MALPcut", "Bg", 100, 0., 50.)
 	histBgEphoDR = ROOT.TH2F("Bg", "Bg", 100, 0.00, 1.1, 100, 0., 6.)
 	histBgEphoMalp = ROOT.TH2F("Bg_2","Bg_2", 100, -70, 35, 100, -90, 60)
+	histBgEphoDR_afterMALPcut = ROOT.TH2F("Bg_afterMALPcut", "Bg_afterMALPcut", 100, 0.0, 1.1, 100, 0., 6.)
+
 	# Loop over signal events
 	for entry in range(0, BgnumberOfEntries):
 		# Load selected branches with data from specified event
@@ -334,7 +340,10 @@ def funcbhisto():
 		histBgMALP.Fill(MALP)
 		histBgMALPcut.Fill(MALPcut)
 		histBgEphoDR.Fill(epho2epho1, Bg_DeltaR)
-
+		if MALPcut<1.5:
+			histBgEphoDR_afterMALPcut.Fill(epho2epho1, Bg_DeltaR)
+	
+	histBgEphoDR_afterMALPcut.Write()
 	histBgEphoMalp.Write()
 	histBgepho2epho1.Write()
 	histBgdeltar.Write()
