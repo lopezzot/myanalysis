@@ -1,3 +1,5 @@
+
+
 def ass_3l(vp, ecm, testmass, imind = 0, ipalp1 = 0, ipalp2 = 0, egtest = 0):
 	'''' take an array of 3lorentz vector for the three photons
 	and based on the test mass value in input and on the ecm of accelerator
@@ -32,7 +34,7 @@ def ass_3l(vp, ecm, testmass, imind = 0, ipalp1 = 0, ipalp2 = 0, egtest = 0):
 		ipalp2 = 2
 		egtest = egtest2
 
-	if abs(ephotest-vp[2].E()) < minmd: #fixed there was an error in abs()
+	if abs(ephotest-vp[2].E()) < minmd: 
 		minmd = abs(ephotest-vp[2].E())
 		imind = 2
 		ipalp1 = 0
