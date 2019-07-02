@@ -132,7 +132,7 @@ def funcs(cutDR, cutEpho):
 		
 		Sg_DeltaR = threephotons_vec[ipalp1].DeltaR(threephotons_vec[ipalp2])
 			
-		if MALPcut < 1.5 and 0.8 < Sg_DeltaR < 1.4 and epho2epho1>0.25:
+		if MALPcut < 1.5 and Sg_DeltaR < 1.3 and epho2epho1>0.25:
 			s_counter = s_counter+1
 		
 	#print s_counter
@@ -188,7 +188,7 @@ def funcb(cutDR, cutEpho):
 	
 		Bg_DeltaR = threephotons_vec[ipalp1].DeltaR(threephotons_vec[ipalp2])
 	
-		if MALPcut < 1.5 and 0.8 < Bg_DeltaR < 1.4 and epho2epho1>0.25:
+		if MALPcut < 1.5 and Bg_DeltaR < 1.3 and epho2epho1>0.25:
 			b_counter = b_counter+1
 		
 	#print b_counter
@@ -208,9 +208,15 @@ def funcshisto():
 	histSgdeltar = ROOT.TH1F("Sg_DeltaR", "Sg_DeltaR", 100, 0., 10.)
 	histSgMALP = ROOT.TH1F("Sg_MALP", "Sg", 100, 0., 100.)
 	histSgMALPcut = ROOT.TH1F("Sg_MALPcut", "Sg", 100, 0., 50.)
+	histSgMALPcut_aftercut = ROOT.TH1F("Sg_MALPcut_aftercut", "Sg", 100, 0., 50.)
 	histSgEphoDR = ROOT.TH2F("Sg", "Sg", 100, 0.0, 1.1, 100, 0., 6.)
 	histSgEphoMalp = ROOT.TH2F("Sg_2","Sg_2", 100, -4, 4, 100, -5, 5)
 	histSgEphoMalp_afterMALPcut = ROOT.TH2F("Sg_afterMALPcut", "Sg_afterMALPcut", 100, -4, 4, 100, -5, 5)
+
+	#histograms for third photon
+	histSgDRalppho3 = ROOT.TH1F("Sg_DRalp_pho3", "Sg_DRalp_pho3", 100, 0., 10.)
+	histSgpalppho3 = ROOT.TH1F("Sg_palp_ppho3", "Sg_palp_ppho3", 100, 0., 2.)
+	histSgEalp_epho3 = ROOT.TH1F("Sg_Ealp_epho3", "Sg_Ealp_epho3", 100, 0., 2.)
 
 	# Loop over signal events
 	for entry in range(0, SgnumberOfEntries):
@@ -260,15 +266,34 @@ def funcshisto():
 		
 		MALPcut = ((MALP-testmass)**2/(sigmaalp**2)+(epho3-ephotest)**2/(sigmaepho3**2))**0.5
 		
+		#Quantities with third photon
+		alp_vector = threephotons_vec[ipalp1]+threephotons_vec[ipalp2] 
+		pho3 = threephotons_vec[imind]
+		Ealp = alp_vector.E()
+		EalpEpho3 = alp_vector.E()/pho3.E()
+		Dr_alppho3 = alp_vector.DeltaR(pho3)
+		alp_3vector = alp_vector.Vect()
+		pho3_3vector = pho3.Vect()
+		palpppho3 = alp_3vector.Mag()/pho3_3vector.Mag()
+
 		histSgEphoMalp.Fill((epho3-ephotest)/sigmaepho3, (MALP-testmass)/sigmaalp )
 		histSgepho2epho1.Fill(epho2epho1)
 		histSgdeltar.Fill(Sg_DeltaR)
 		histSgMALP.Fill(MALP)
 		histSgMALPcut.Fill(MALPcut)
 		histSgEphoDR.Fill(epho2epho1, Sg_DeltaR)
-		if MALPcut<1.5:
+		if MALPcut<3.0:
 			histSgEphoMalp_afterMALPcut.Fill(epho2epho1, Sg_DeltaR)
+		if epho2epho1>0.25 and Sg_DeltaR<1.3:
+			histSgMALPcut_aftercut.Fill(MALPcut)
+		
+		if MALPcut<1.5 and epho2epho1>0.25 and Sg_DeltaR<1.3:
+			#Fill histo with third photon
+			histSgDRalppho3.Fill(Dr_alppho3)
+			histSgpalppho3.Fill(palpppho3)
+			histSgEalp_epho3.Fill(EalpEpho3)
 
+	histSgMALPcut_aftercut.Write()
 	histSgEphoMalp_afterMALPcut.Write()
 	histSgEphoMalp.Write()
 	histSgepho2epho1.Write()
@@ -276,15 +301,24 @@ def funcshisto():
 	histSgMALP.Write()
 	histSgMALPcut.Write()
 	histSgEphoDR.Write()
+	histSgDRalppho3.Write()
+	histSgpalppho3.Write()
+	histSgEalp_epho3.Write()
 
 def funcbhisto():
 	histBgepho2epho1 = ROOT.TH1F("Bg_Epho2/Epho1", "Bg_Epho2/Epho1", 150, 0.0, 1.1)
 	histBgdeltar = ROOT.TH1F("Bg_DeltaR", "Bg_DeltaR", 100, 0., 10.)
 	histBgMALP = ROOT.TH1F("Bg_MALP", "Bg", 100, 0., 100.)
 	histBgMALPcut = ROOT.TH1F("Bg_MALPcut", "Bg", 100, 0., 50.)
+	histBgMALPcut_aftercut = ROOT.TH1F("Bg_MALPcut_aftercut", "Bg", 100, 0., 50.)
 	histBgEphoDR = ROOT.TH2F("Bg", "Bg", 100, 0.00, 1.1, 100, 0., 6.)
 	histBgEphoMalp = ROOT.TH2F("Bg_2","Bg_2", 100, -70, 35, 100, -90, 60)
-	histBgEphoDR_afterMALPcut = ROOT.TH2F("Bg_afterMALPcut", "Bg_afterMALPcut", 100, -70, 35, 100, -90, 60)
+	histBgEphoDR_afterMALPcut = ROOT.TH2F("Bg_afterMALPcut", "Bg_afterMALPcut", 100, 0.0, 1.1, 100, 0.0, 6.)
+
+	#histograms for third photon
+	histBgDRalppho3 = ROOT.TH1F("Bg_DRalp_pho3", "Bg_DRalp_pho3", 100, 0., 10.)
+	histBgpalppho3 = ROOT.TH1F("Bg_palp_ppho3", "Bg_palp_ppho3", 100, 0., 2.)
+	histBgEalp_epho3 = ROOT.TH1F("Bg_Ealp_epho3", "Bg_Ealp_epho3", 100, 0., 2.)
 
 	# Loop over signal events
 	for entry in range(0, BgnumberOfEntries):
@@ -333,6 +367,17 @@ def funcbhisto():
 		Bg_DeltaR = threephotons_vec[ipalp1].DeltaR(threephotons_vec[ipalp2])
 		
 		MALPcut = ((MALP-testmass)**2/(sigmaalp**2)+(epho3-ephotest)**2/(sigmaepho3)**2)**0.5
+
+		#Quantities with third photon
+		alp_vector = threephotons_vec[ipalp1]+threephotons_vec[ipalp2] 
+		pho3 = threephotons_vec[imind]
+		Ealp = alp_vector.E()
+		EalpEpho3 = alp_vector.E()/pho3.E()
+		Dr_alppho3 = alp_vector.DeltaR(pho3)
+		alp_3vector = alp_vector.Vect()
+		pho3_3vector = pho3.Vect()
+		palpppho3 = alp_3vector.Mag()/pho3_3vector.Mag()
+
 		#print (epho3-ephotest)/sigmaepho3, (MALP-testmass)/sigmaalp
 		histBgEphoMalp.Fill((epho3-ephotest)/sigmaepho3, (MALP-testmass)/sigmaalp )
 		histBgepho2epho1.Fill(epho2epho1)
@@ -340,9 +385,18 @@ def funcbhisto():
 		histBgMALP.Fill(MALP)
 		histBgMALPcut.Fill(MALPcut)
 		histBgEphoDR.Fill(epho2epho1, Bg_DeltaR)
-		if MALPcut<1.5:
+		if MALPcut<3.0:
 			histBgEphoDR_afterMALPcut.Fill(epho2epho1, Bg_DeltaR)
+		if epho2epho1>0.25 and Bg_DeltaR<1.3:
+			histBgMALPcut_aftercut.Fill(MALPcut)
 
+		if MALPcut<1.5 and epho2epho1>0.25 and Bg_DeltaR<1.3:
+			#Fill histo with third photon
+			histBgDRalppho3.Fill(Dr_alppho3)
+			histBgpalppho3.Fill(palpppho3)
+			histBgEalp_epho3.Fill(EalpEpho3)
+
+	histBgMALPcut_aftercut.Write()
 	histBgEphoDR_afterMALPcut.Write()
 	histBgEphoMalp.Write()
 	histBgepho2epho1.Write()
@@ -350,6 +404,9 @@ def funcbhisto():
 	histBgMALP.Write()
 	histBgMALPcut.Write()
 	histBgEphoDR.Write()
+	histBgDRalppho3.Write()
+	histBgpalppho3.Write()
+	histBgEalp_epho3.Write()
 
 cutDRarray = array('d',[])
 cutEphoarray=array('d',[])

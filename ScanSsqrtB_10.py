@@ -132,7 +132,7 @@ def funcs(cutDR, cutEpho):
 		
 		Sg_DeltaR = threephotons_vec[ipalp1].DeltaR(threephotons_vec[ipalp2])
 			
-		if MALPcut < 1.5 and 0.4 < Sg_DeltaR < 0.8 and epho2epho1>0.2:
+		if MALPcut < 1.5 and Sg_DeltaR < 1.0:
 			s_counter = s_counter+1
 		
 	#print s_counter
@@ -188,7 +188,7 @@ def funcb(cutDR, cutEpho):
 	
 		Bg_DeltaR = threephotons_vec[ipalp1].DeltaR(threephotons_vec[ipalp2])
 	
-		if MALPcut < 1.5 and 0.4 < Bg_DeltaR < 0.8 and epho2epho1>0.2:
+		if MALPcut < 1.5 and Bg_DeltaR < 1.0:
 			b_counter = b_counter+1
 		
 	#print b_counter
@@ -208,6 +208,7 @@ def funcshisto():
 	histSgdeltar = ROOT.TH1F("Sg_DeltaR", "Sg_DeltaR", 100, 0., 10.)
 	histSgMALP = ROOT.TH1F("Sg_MALP", "Sg", 100, 0., 100.)
 	histSgMALPcut = ROOT.TH1F("Sg_MALPcut", "Sg", 100, 0., 50.)
+	histSgMALPcut_aftercut = ROOT.TH1F("Sg_MALPcut_aftercut", "Sg", 100, 0., 50.)
 	histSgEphoDR = ROOT.TH2F("Sg", "Sg", 100, 0.0, 1.1, 100, 0., 6.)
 	histSgEphoDR_afterMALPcut = ROOT.TH2F("Sg_afterMALPcut", "Sg_afterMALPcut", 100, 0.0, 1.1, 100, 0., 6.)
 	histSgEphoMalp = ROOT.TH2F("Sg_2","Sg_2", 100, -4, 4, 100, -5, 5)
@@ -266,9 +267,12 @@ def funcshisto():
 		histSgMALP.Fill(MALP)
 		histSgMALPcut.Fill(MALPcut)
 		histSgEphoDR.Fill(epho2epho1, Sg_DeltaR)
-		if MALPcut<1.5:
+		if MALPcut<3.0:
 			histSgEphoDR_afterMALPcut.Fill(epho2epho1, Sg_DeltaR)
-	
+		if Sg_DeltaR<1.0:
+			histSgMALPcut_aftercut.Fill(MALPcut)
+
+	histSgMALPcut_aftercut.Write()
 	histSgEphoDR_afterMALPcut.Write()
 	histSgEphoMalp.Write()
 	histSgepho2epho1.Write()
@@ -282,9 +286,10 @@ def funcbhisto():
 	histBgdeltar = ROOT.TH1F("Bg_DeltaR", "Bg_DeltaR", 100, 0., 10.)
 	histBgMALP = ROOT.TH1F("Bg_MALP", "Bg", 100, 0., 100.)
 	histBgMALPcut = ROOT.TH1F("Bg_MALPcut", "Bg", 100, 0., 50.)
+	histBgMALPcut_aftercut = ROOT.TH1F("Bg_MALPcut_aftercut", "Bg", 100, 0., 50.)
 	histBgEphoDR = ROOT.TH2F("Bg", "Bg", 100, 0.00, 1.1, 100, 0., 6.)
 	histBgEphoMalp = ROOT.TH2F("Bg_2","Bg_2", 100, -70, 35, 100, -90, 60)
-	histBgEphoDR_afterMALPcut = ROOT.TH2F("Bg_afterMALPcut", "Bg_afterMALPcut", 100, -70, 35, 100, -90, 60)
+	histBgEphoDR_afterMALPcut = ROOT.TH2F("Bg_afterMALPcut", "Bg_afterMALPcut", 100, 0.0, 1.1, 100, 0.0, 6.)
 
 	# Loop over signal events
 	for entry in range(0, BgnumberOfEntries):
@@ -340,9 +345,12 @@ def funcbhisto():
 		histBgMALP.Fill(MALP)
 		histBgMALPcut.Fill(MALPcut)
 		histBgEphoDR.Fill(epho2epho1, Bg_DeltaR)
-		if MALPcut<1.5:
+		if MALPcut<3.0:
 			histBgEphoDR_afterMALPcut.Fill(epho2epho1, Bg_DeltaR)
-	
+		if Bg_DeltaR<1.0:
+			histBgMALPcut_aftercut.Fill(MALPcut)
+
+	histBgMALPcut_aftercut.Write()
 	histBgEphoDR_afterMALPcut.Write()
 	histBgEphoMalp.Write()
 	histBgepho2epho1.Write()
