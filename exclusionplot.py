@@ -5,9 +5,13 @@ coupligs = array('d')
 masses = array('d')
 theoretical = array('d')
 theoretical365 = array('d')
+theoretical240 = array('d')
 
 coupling365 = array('d')
 masses365 = array('d')
+
+coupling240 = array('d')
+masses240 = array('d')
 
 rootfile = TFile("output.root","RECREATE")
 c = [10000, 0.00446, 0.00540, 0.00686, 0.00765, 0.00885, 0.0143, 0.018, 0.046, 10000, 10000]
@@ -17,6 +21,9 @@ t = [10000, 0.00010584473200797015, 0.00011195767438563123, 0.000123337183697661
 
 c365 = [10000, 0.078215, 0.09351, 0.122627, 0.16467, 0.25945, 0.4986, 23.347, 10000]
 m365 = [50, 50, 100, 150, 200, 240, 300, 360, 360]
+
+m240 = [10000, 100, 150, 180, 220, 235, 235]
+c240 = [1000, 0.122954, 0.156492, 0.271, 1.5352, 13.147, 10000]
 
 t365 = [1000, 0.011805359356280826, 0.01291984002946909, 0.016237318278912834, 0.022378778938076393, 0.03174363246917037, 0.07593830445852476, 3.1646458992183386, 1000]
 
@@ -34,6 +41,11 @@ for t in m365:
 	masses365.append(t)
 for p in t365:
 	theoretical365.append(p)
+
+for t in c240:
+	coupling240.append(t)
+for d in m240:
+	masses240.append(d)
 
 canvas=TCanvas("canvas","canvas",800,800)
 canvas.SetLogy()
@@ -82,6 +94,22 @@ Exclusiongraph365.SetFillColorAlpha(3, 0.5)
 Exclusiongraph365.SetLineColor(3)
 Exclusiongraph365.SetLineWidth(3)
 
+Exclusiongraph240 = TGraph(len(m240), masses240, coupling240)
+Exclusiongraph240.SetTitle("")
+Exclusiongraph240.GetHistogram().SetMaximum(2000.)
+Exclusiongraph240.GetHistogram().SetMinimum(0.1e-6)
+XAxis = Exclusiongraph240.GetXaxis()
+XAxis.SetLimits(1.e-15,2000)
+XAxis.SetNdivisions(105)
+XAxis.SetTitle("M_{a} [GeV]")
+XAxis.SetTitleOffset(1.5)
+YAxis = Exclusiongraph240.GetYaxis()
+YAxis.SetNdivisions(105)
+YAxis.SetTitle("c")
+Exclusiongraph240.SetFillColorAlpha(5, 0.5)
+Exclusiongraph240.SetLineColor(5)
+Exclusiongraph240.SetLineWidth(5)
+
 Exclusiongrapht365 = TGraph(len(masses365), masses365, theoretical365)
 Exclusiongrapht365.SetTitle("")
 Exclusiongrapht365.GetHistogram().SetMaximum(2000.)
@@ -112,6 +140,7 @@ mg.Add(Exclusiongraph)
 mg.Add(Exclusiongraph2)
 mg.Add(Exclusiongraph365)
 mg.Add(Exclusiongrapht365)
+mg.Add(Exclusiongraph240)
 mg.SetTitle("")
 mg.GetHistogram().SetMaximum(2000.)
 mg.GetHistogram().SetMinimum(0.1e-6)
