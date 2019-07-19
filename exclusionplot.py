@@ -18,8 +18,8 @@ coupling160 = array('d')
 masses160 = array('d')
 
 rootfile = TFile("output.root","RECREATE")
-c = [10000, 0.00446, 0.00540, 0.00686, 0.00765, 0.00885, 0.0143, 0.018, 0.046, 10000, 10000]
-m = [10, 10, 20, 30, 40, 50, 60, 70, 80, 80, 10]
+c = [10000, 0.007146, 0.00446, 0.00540, 0.00686, 0.00765, 0.00885, 0.0143, 0.018, 0.046, 10000, 10000]
+m = [10, 5, 10, 20, 30, 40, 50, 60, 70, 80, 80, 10]
 
 t = [10000, 0.00010584473200797015, 0.00011195767438563123, 0.00012333718369766136, 0.00014287565957617757, 0.0001768077913388226, 0.00024087176728341438, 0.0003875681881371373, 0.0008997139223959913, 10000, 10000]
 
@@ -30,12 +30,12 @@ m240 = [100, 100, 150, 180, 220, 235, 235]
 c240 = [10000, 0.122954, 0.156492, 0.271, 1.5352, 13.147, 10000]
 t240 = [10000, 0.008302866109567658, 0.014043267960524476, 0.02400387934037744, 0.1135393636633489, 0.8767545798463641, 10000]
 
-t365 = [1000, 0.011805359356280826, 0.01291984002946909, 0.016237318278912834, 0.022378778938076393, 0.03174363246917037, 0.07593830445852476, 3.1646458992183386, 1000]
+t365 = [10000, 0.011805359356280826, 0.01291984002946909, 0.016237318278912834, 0.022378778938076393, 0.03174363246917037, 0.07593830445852476, 3.1646458992183386, 10000]
 
 m160 = [50, 50, 100, 120, 140, 155, 155]
-c160 = [1000, 0.117973, 0.157546, 0.153418175, 0.765888, 8.2, 1000]
+c160 = [10000, 0.117973, 0.157546, 0.153418175, 0.765888, 8.2, 10000]
 
-t160 = [0.005868095964649793, 0.00897964053112733, 0.015062350679744235, 0.03967262339072189, 0.30158366478681703]
+t160 = [10000, 0.005868095964649793, 0.00897964053112733, 0.015062350679744235, 0.03967262339072189, 0.30158366478681703, 10000]
 
 for i in c:
 	coupligs.append(i)
@@ -58,6 +58,14 @@ for d in m240:
 for i in t240:
 	theoretical240.append(i)
 
+for t in c160:
+	coupling160.append(t)
+for d in m160:
+	masses160.append(d)
+for i in t160:
+	theoretical160.append(i)
+
+
 canvas=TCanvas("canvas","canvas",800,800)
 canvas.SetLogy()
 canvas.SetLogx()
@@ -69,7 +77,7 @@ XAxis = Exclusiongraph.GetXaxis()
 XAxis.SetLimits(1.e-15,2000)
 Exclusiongraph.SetFillColorAlpha(7, 0.5)
 Exclusiongraph.SetLineColor(7)
-Exclusiongraph.SetLineWidth(3)
+Exclusiongraph.SetLineWidth(1)
 
 Exclusiongraph2 = TGraph(len(m), masses, theoretical)
 Exclusiongraph2.SetTitle("")
@@ -85,7 +93,7 @@ YAxis.SetNdivisions(105)
 YAxis.SetTitle("c")
 Exclusiongraph2.SetFillColorAlpha(7, 0.5)
 Exclusiongraph2.SetLineColor(7)
-Exclusiongraph2.SetLineWidth(3)
+Exclusiongraph2.SetLineWidth(1)
 Exclusiongraph2.SetLineStyle(3)
 Exclusiongraph2.SetFillStyle(3001)
 
@@ -103,7 +111,23 @@ YAxis.SetNdivisions(105)
 YAxis.SetTitle("c")
 Exclusiongraph365.SetFillColorAlpha(3, 0.5)
 Exclusiongraph365.SetLineColor(3)
-Exclusiongraph365.SetLineWidth(3)
+Exclusiongraph365.SetLineWidth(1)
+
+Exclusiongraph160 = TGraph(len(m160), masses160, coupling160)
+Exclusiongraph160.SetTitle("")
+Exclusiongraph160.GetHistogram().SetMaximum(2000.)
+Exclusiongraph160.GetHistogram().SetMinimum(0.1e-6)
+XAxis = Exclusiongraph160.GetXaxis()
+XAxis.SetLimits(1.e-15,2000)
+XAxis.SetNdivisions(105)
+XAxis.SetTitle("M_{a} [GeV]")
+XAxis.SetTitleOffset(1.5)
+YAxis = Exclusiongraph160.GetYaxis()
+YAxis.SetNdivisions(105)
+YAxis.SetTitle("c")
+Exclusiongraph160.SetFillColorAlpha(2, 0.5)
+Exclusiongraph160.SetLineColor(2)
+Exclusiongraph160.SetLineWidth(1)
 
 Exclusiongraph240 = TGraph(len(m240), masses240, coupling240)
 Exclusiongraph240.SetTitle("")
@@ -119,7 +143,7 @@ YAxis.SetNdivisions(105)
 YAxis.SetTitle("c")
 Exclusiongraph240.SetFillColorAlpha(5, 0.5)
 Exclusiongraph240.SetLineColor(5)
-Exclusiongraph240.SetLineWidth(5)
+Exclusiongraph240.SetLineWidth(1)
 
 Exclusiongrapht365 = TGraph(len(masses365), masses365, theoretical365)
 Exclusiongrapht365.SetTitle("")
@@ -135,7 +159,7 @@ YAxis.SetNdivisions(105)
 YAxis.SetTitle("c")
 Exclusiongrapht365.SetFillColorAlpha(3, 0.5)
 Exclusiongrapht365.SetLineColor(3)
-Exclusiongrapht365.SetLineWidth(3)
+Exclusiongrapht365.SetLineWidth(1)
 Exclusiongrapht365.SetLineStyle(3)
 Exclusiongrapht365.SetFillStyle(3001)
 
@@ -153,9 +177,27 @@ YAxis.SetNdivisions(105)
 YAxis.SetTitle("c")
 Exclusiongrapht240.SetFillColorAlpha(5, 0.5)
 Exclusiongrapht240.SetLineColor(5)
-Exclusiongrapht240.SetLineWidth(5)
+Exclusiongrapht240.SetLineWidth(1)
 Exclusiongrapht240.SetLineStyle(5)
 Exclusiongrapht240.SetFillStyle(3001)
+
+Exclusiongrapht160 = TGraph(len(masses160), masses160, theoretical160)
+Exclusiongrapht160.SetTitle("")
+Exclusiongrapht160.GetHistogram().SetMaximum(2000.)
+Exclusiongrapht160.GetHistogram().SetMinimum(0.1e-6)
+XAxis = Exclusiongrapht160.GetXaxis()
+XAxis.SetLimits(1.e-15,2000)
+XAxis.SetNdivisions(105)
+XAxis.SetTitle("M_{a} [GeV]")
+XAxis.SetTitleOffset(1.5)
+YAxis = Exclusiongrapht160.GetYaxis()
+YAxis.SetNdivisions(105)
+YAxis.SetTitle("c")
+Exclusiongrapht160.SetFillColorAlpha(2, 0.5)
+Exclusiongrapht160.SetLineColor(2)
+Exclusiongrapht160.SetLineWidth(1)
+Exclusiongrapht160.SetLineStyle(5)
+Exclusiongrapht160.SetFillStyle(3001)
 
 '''
 Exclusiongraph365.Draw("afl")
@@ -171,6 +213,8 @@ mg.Add(Exclusiongraph365)
 mg.Add(Exclusiongrapht365)
 mg.Add(Exclusiongraph240)
 mg.Add(Exclusiongrapht240)
+mg.Add(Exclusiongrapht160)
+mg.Add(Exclusiongraph160)
 mg.SetTitle("")
 mg.GetHistogram().SetMaximum(2000.)
 mg.GetHistogram().SetMinimum(0.1e-6)
