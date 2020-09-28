@@ -202,7 +202,7 @@ def funcssqrtb(cutDR, cutEpho):
 	b = funcb(cutDR, cutEpho)
 	s1 = s*xsec_scanalp160_155_eta10*luminosity/SgnumberOfEntries
 	b1 = b*xsec_3abg160_eta10 * luminosity/BgnumberOfEntries
-	print str(cutDR)+"  "+str(cutEpho)+"  "+str(s)+"  "+str(b)+"  "+str(s1)+"  "+str(b1)+"  "+str(s1/(b1**0.5))+"\n"
+	print "out-> "+str(cutDR)+"  "+str(cutEpho)+"  "+str(s)+"  "+str(b)+"  "+str(s1)+"  "+str(b1)+"  "+str(s1/(b1**0.5))+"\n"
 	return s,b,s1/(b1**0.5)  
 
 def funcshisto():
