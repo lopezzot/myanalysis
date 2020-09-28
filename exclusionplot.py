@@ -19,7 +19,7 @@ masses160 = array('d')
 
 rootfile = TFile("output.root","RECREATE")
 c = [10000, 0.007146, 0.00446, 0.00540, 0.00686, 0.00765, 0.00885, 0.0143, 0.018, 0.046, 10000, 10000]
-m = [5, 5, 10, 20, 30, 40, 50, 60, 70, 80, 80, 10]
+m = [5, 5, 10, 20, 30, 40, 50, 60, 70, 80, 80, 5]
 
 t = [10000,0.00010531464629643753, 0.00010584473200797015, 0.00011195767438563123, 0.00012333718369766136, 0.00014287565957617757, 0.0001768077913388226, 0.00024087176728341438, 0.0003875681881371373, 0.0008997139223959913, 10000, 10000]
 
@@ -207,19 +207,20 @@ Exclusiongraph.Draw("same fl")
 '''
 
 mg = TMultiGraph()
-mg.Add(Exclusiongraph)
-mg.Add(Exclusiongraph2)
 mg.Add(Exclusiongraph365)
 mg.Add(Exclusiongrapht365)
 mg.Add(Exclusiongraph240)
 mg.Add(Exclusiongrapht240)
 mg.Add(Exclusiongrapht160)
 mg.Add(Exclusiongraph160)
+mg.Add(Exclusiongraph)
+mg.Add(Exclusiongraph2)
 mg.SetTitle("")
 mg.GetHistogram().SetMaximum(2000.)
 mg.GetHistogram().SetMinimum(0.1e-6)
 XAxis = mg.GetXaxis()
-XAxis.SetLimits(1.e-15,2000)
+#XAxis.SetLimits(1.e-15,2000)
+XAxis.SetLimits(3,1000)
 XAxis.SetNdivisions(105)
 XAxis.SetTitle("M_{a} [GeV]")
 XAxis.SetTitleOffset(1.5)
