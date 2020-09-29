@@ -1,4 +1,4 @@
-
+import math
 
 def ass_3l(vp, ecm, testmass, imind = 0, ipalp1 = 0, ipalp2 = 0, egtest = 0):
 	'''' take an array of 3lorentz vector for the three photons
@@ -42,3 +42,23 @@ def ass_3l(vp, ecm, testmass, imind = 0, ipalp1 = 0, ipalp2 = 0, egtest = 0):
 		egtest = egtest3
 
 	return ipalp1, ipalp2, imind, egtest
+
+def plotSignificance(observed, b1, error):
+    #significance calculated from https://cds.cern.ch/record/2643488
+    # relabel variables to match CDS formula
+
+    nbObs = observed
+    nbExp = b1
+    nbExpEr = error*nbExp
+
+    #print 'calculating significance from W. Buttinger and M.Lefebvre recommendation'
+    factor1 = nbObs*math.log( (nbObs*(nbExp+nbExpEr**2))/(nbExp**2+nbObs*nbExpEr**2) )
+    factor2 = (nbExp**2/nbExpEr**2)*math.log( 1 + (nbExpEr**2*(nbObs-nbExp))/(nbExp*(nbExp+nbExpEr**2)) )
+
+    if nbObs < nbExp:
+        pull  = -math.sqrt(2*(factor1 - factor2))
+    else:
+        pull  = math.sqrt(2*(factor1 - factor2))
+
+    #print "pull: "+str(pull)
+    return pull
