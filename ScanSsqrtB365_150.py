@@ -203,6 +203,33 @@ def funcssqrtb(cutDR, cutEpho):
 	s1 = s*xsec_scanalp365_150_eta10*luminosity/SgnumberOfEntries
 	b1 = b*xsec_3abg365_eta10 * luminosity/BgnumberOfEntries
 	print str(cutDR)+"  "+str(cutEpho)+"  "+str(s)+"  "+str(b)+"  "+str(s1)+"  "+str(b1)+"  "+str(s1/(b1**0.5))+"\n"
+	coupling = (((b1**0.5)*2*0.01**2)/s1)**0.5
+	print "coupling no systematics: "+str(coupling)
+
+	testcoupling = []
+	testsign05 = []
+	testsign01 = []
+	testsign001 = []
+
+	for i in range(2000):
+		coupling = coupling+0.0001
+		observed = b1+s1*coupling**2/(0.01**2)
+		pull05 = includeme.plotSignificance(observed, b1, 0.05)
+		pull01 = includeme.plotSignificance(observed, b1, 0.01)
+		pull001 = includeme.plotSignificance(observed, b1, 0.001)		
+		testcoupling.append(coupling)
+		testsign05.append(pull05)
+		testsign01.append(pull01)
+		testsign001.append(pull001)
+
+	testsign05 = [abs(x-2.) for x in testsign05]
+	print testcoupling[testsign05.index(min(testsign05))]
+	testsign01 = [abs(x-2.) for x in testsign01]
+	print testcoupling[testsign01.index(min(testsign01))]
+	testsign001 = [abs(x-2.) for x in testsign001]
+	print testcoupling[testsign001.index(min(testsign001))]	
+	print "coupling max = "+str(coupling)
+
 	return s,b,s1/(b1**0.5)  
 
 def funcshisto():
