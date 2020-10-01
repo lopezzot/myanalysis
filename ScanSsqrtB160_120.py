@@ -137,7 +137,7 @@ def funcs(cutDR, cutEpho):
 		
 		Sg_DeltaR = threephotons_vec[ipalp1].DeltaR(threephotons_vec[ipalp2])
 		
-		if MALPcut < 1.5 and epho2epho1>0.55 and Sg_DeltaR<3.1:
+		if MALPcut < 1.5 and (epho2epho1>0.3 and Sg_DeltaR<3.0):
 			s_counter = s_counter+1
 		
 	#print s_counter
@@ -205,7 +205,7 @@ def funcb(cutDR, cutEpho):
 		
 			Bg_DeltaR = threephotons_vec[ipalp1].DeltaR(threephotons_vec[ipalp2])
 		
-			if MALPcut < 1.5 and epho2epho1>0.55 and Bg_DeltaR<3.1:
+			if MALPcut < 1.5 and (epho2epho1>0.3 and Bg_DeltaR<3.0):
 				b_counter = b_counter+1
 		
 		print "bkg file "+str(filenumber)+", sum of events in sg: "+str(b_counter)
