@@ -24,6 +24,7 @@ try:
 except:
 	pass
 
+global BgFile
 BgFile = sys.argv[1] #background file
 SgFile = sys.argv[2] #signal file
 outputFile = sys.argv[3]
@@ -31,7 +32,8 @@ test_testmass = sys.argv[4]
 
 # Create chain of root trees
 Bgchain = ROOT.TChain("Delphes")
-Bgchain.Add(BgFile)
+BgFile0 = BgFile+"0_delphes.root"
+Bgchain.Add(BgFile0)
 
 Sgchain = ROOT.TChain("Delphes")
 Sgchain.Add(SgFile)
@@ -40,7 +42,7 @@ Sgchain.Add(SgFile)
 BgtreeReader = ROOT.ExRootTreeReader(Bgchain)
 global BgnumberOfEntries
 BgnumberOfEntries = BgtreeReader.GetEntries()
-print "bg entries: "+str(BgnumberOfEntries)
+print "bg entries first file: "+str(BgnumberOfEntries)
 
 SgtreeReader = ROOT.ExRootTreeReader(Sgchain)
 global SgnumberOfEntries
@@ -73,8 +75,8 @@ global xsec_3abg90_eta10
 global luminosity
 
 #xsec10 = [0.0002380292, 0.0002127458, 0.0001752995, 0.0001306328, 8.530332e-05, 4.596179e-05, 1.775303e-05, 3.294275e-06]
-xsec_scanalp90_70_eta10 = 17.75303 #ab #from lorenzo/alp/lorenzo/xsectocyy.py
-xsec_3abg90_eta10 = 2.8882e06 #ab #from polesell/work/alpbg/fcc3a/Events/3abf_90_1
+xsec_scanalp90_70_eta10 = 17.46794 #ab #from lorenzo/alp/lorenzo/xsectocyy.py
+xsec_3abg90_eta10 = 5.6315e06 #ab #from polesell/work/alpbg/fcc3a/Events/3abf_90_1
 luminosity = 150 #ab^-1
 
 out_root = ROOT.TFile(outputFile,"RECREATE")	
@@ -140,66 +142,107 @@ def funcs(cutDR, cutEpho):
 
 def funcb(cutDR, cutEpho):
 	b_counter = 0
-	# Loop over background events
-	for entry in range(0, BgnumberOfEntries):
-		# Load selected branches with data from specified event
-		BgtreeReader.ReadEntry(entry)
 
-		threephotons_vec = [] #array with 3 TLorentzVector from 3 photons
+	for filenumber in range(0,1000):
+		Bgchain = ROOT.TChain("Delphes")
+		print BgFile+str(filenumber)+"_delphes.root"
+		Bgchain.Add(BgFile+str(filenumber)+"_delphes.root")
+		# Create object of class ExRootTreeReader
+		BgtreeReader = ROOT.ExRootTreeReader(Bgchain)
 
-		#use only events with 3 photons and not tracks
-		if BgbranchPhoton.GetEntries() != 3:
-			continue
-		if BgbranchTrack.GetEntries() != 0:
-			continue
-	
-		#add lorentzvetor photons in vector
-		for i in range(0, BgbranchPhoton.GetEntries()):
+		# Get pointers to branches used in this analysis
+		BgbranchPhoton = BgtreeReader.UseBranch("Photon")
+		BgbranchTrack = BgtreeReader.UseBranch("Track")
 
-			photon = BgbranchPhoton.At(i)
-			Photon_TLV = photon.P4()                  #TLorentzVector
-			threephotons_vec.append(Photon_TLV)
-		
-		#find two photons 
-		ipalp1, ipalp2, imind, egtest = includeme.ass_3l(threephotons_vec, ecm, testmass)
-		
-		#assing ipalp1 to the photon with max energy between ipalp1 and ipalp2
-		if threephotons_vec[ipalp1].E() < threephotons_vec[ipalp2].E():
-			ipalp1_temporary = ipalp2
-			ipalp2 = ipalp1
-			ipalp1 = ipalp1_temporary
-			del ipalp1_temporary
- 		
-		MALP = (threephotons_vec[ipalp1]+threephotons_vec[ipalp2]).M()
-		epho1 = threephotons_vec[ipalp1].E()
-		sigmaepho1 =(0.1*0.1*epho1+0.01*0.01*epho1*epho1)**0.5
-		epho2 = threephotons_vec[ipalp2].E()
-		sigmaepho2 =(0.1*0.1*epho2+0.01*0.01*epho2*epho2)**0.5
-		epho3 = threephotons_vec[imind].E()
-		sigmaepho3 =(0.1*0.1*epho3+0.01*0.01*epho3*epho3)**0.5
-		#sigmaalp = 1.057 #from sigma of reconstructed MALP
-		sigmaalp=MALP*0.5*((sigmaepho1/epho1)*(sigmaepho1/epho1)+(sigmaepho2/epho2)*(sigmaepho2/epho2))**0.5
-		
-		ephotest = (ecm*ecm-testmass*testmass)/2./ecm
+		# Loop over background events
+		for entry in range(0, BgnumberOfEntries):
+			# Load selected branches with data from specified event
+			BgtreeReader.ReadEntry(entry)	
 
-		MALPcut = ((MALP-testmass)**2/(sigmaalp**2)+(epho3-ephotest)**2/(sigmaepho3**2))**0.5
+			threephotons_vec = [] #array with 3 TLorentzVector from 3 photons	
+
+			#use only events with 3 photons and not tracks
+			if BgbranchPhoton.GetEntries() != 3:
+				continue
+			if BgbranchTrack.GetEntries() != 0:
+				continue
 		
-		epho2epho1 = threephotons_vec[ipalp2].E()/threephotons_vec[ipalp1].E()	
-	
-		Bg_DeltaR = threephotons_vec[ipalp1].DeltaR(threephotons_vec[ipalp2])
-	
-		if MALPcut < 1.5 and Bg_DeltaR < 3.14 and (epho2epho1<0.75 or Bg_DeltaR<3.05):
-			b_counter = b_counter+1
+			#add lorentzvetor photons in vector
+			for i in range(0, BgbranchPhoton.GetEntries()):	
+
+				photon = BgbranchPhoton.At(i)
+				Photon_TLV = photon.P4()                  #TLorentzVector
+				threephotons_vec.append(Photon_TLV)
+			
+			#find two photons 
+			ipalp1, ipalp2, imind, egtest = includeme.ass_3l(threephotons_vec, ecm, testmass)
+			
+			#assing ipalp1 to the photon with max energy between ipalp1 and ipalp2
+			if threephotons_vec[ipalp1].E() < threephotons_vec[ipalp2].E():
+				ipalp1_temporary = ipalp2
+				ipalp2 = ipalp1
+				ipalp1 = ipalp1_temporary
+				del ipalp1_temporary
+	 		
+			MALP = (threephotons_vec[ipalp1]+threephotons_vec[ipalp2]).M()
+			epho1 = threephotons_vec[ipalp1].E()
+			sigmaepho1 =(0.1*0.1*epho1+0.01*0.01*epho1*epho1)**0.5
+			epho2 = threephotons_vec[ipalp2].E()
+			sigmaepho2 =(0.1*0.1*epho2+0.01*0.01*epho2*epho2)**0.5
+			epho3 = threephotons_vec[imind].E()
+			sigmaepho3 =(0.1*0.1*epho3+0.01*0.01*epho3*epho3)**0.5
+			#sigmaalp = 1.057 #from sigma of reconstructed MALP
+			sigmaalp=MALP*0.5*((sigmaepho1/epho1)*(sigmaepho1/epho1)+(sigmaepho2/epho2)*(sigmaepho2/epho2))**0.5
+			
+			ephotest = (ecm*ecm-testmass*testmass)/2./ecm	
+
+			MALPcut = ((MALP-testmass)**2/(sigmaalp**2)+(epho3-ephotest)**2/(sigmaepho3**2))**0.5
+			
+			epho2epho1 = threephotons_vec[ipalp2].E()/threephotons_vec[ipalp1].E()	
 		
-	#print b_counter
+			Bg_DeltaR = threephotons_vec[ipalp1].DeltaR(threephotons_vec[ipalp2])
+		
+			if MALPcut < 1.5 and Bg_DeltaR < 3.14 and (epho2epho1<0.75 or Bg_DeltaR<3.05):
+				b_counter = b_counter+1
+		
+		Bgchain.Delete()
+		print "bkg file "+str(filenumber)+", sum of events in sg: "+str(b_counter)
+
 	return b_counter
 
 def funcssqrtb(cutDR, cutEpho):
 	s = funcs(cutDR, cutEpho)
 	b = funcb(cutDR, cutEpho)
 	s1 = s*xsec_scanalp90_70_eta10*luminosity/SgnumberOfEntries
-	b1 = b*xsec_3abg90_eta10*luminosity/BgnumberOfEntries
-	print str(cutDR)+"  "+str(cutEpho)+"  "+str(s)+"  "+str(b)+"  "+str(s1)+"  "+str(b1)+"  "+str(s1/(b1**0.5))+"\n"
+	b1 = b*xsec_3abg90_eta10*luminosity/(BgnumberOfEntries*1000)
+	print "out-> "+str(cutDR)+"  "+str(cutEpho)+"  "+str(s)+"  "+str(b)+"  "+str(s1)+"  "+str(b1)+"  "+str(s1/(b1**0.5))+"\n"
+	coupling = (((b1**0.5)*2*0.01**2)/s1)**0.5
+	print "coupling no systematics: "+str(coupling)
+
+	testcoupling = []
+	testsign05 = []
+	testsign01 = []
+	testsign001 = []
+
+	for i in range(20000):
+		coupling = coupling+0.0001
+		observed = b1+s1*coupling**2/(0.01**2)
+		pull05 = includeme.plotSignificance(observed, b1, 0.05)
+		pull01 = includeme.plotSignificance(observed, b1, 0.01)
+		pull001 = includeme.plotSignificance(observed, b1, 0.001)		
+		testcoupling.append(coupling)
+		testsign05.append(pull05)
+		testsign01.append(pull01)
+		testsign001.append(pull001)
+
+	testsign05 = [abs(x-2.) for x in testsign05]
+	print testcoupling[testsign05.index(min(testsign05))]
+	testsign01 = [abs(x-2.) for x in testsign01]
+	print testcoupling[testsign01.index(min(testsign01))]
+	testsign001 = [abs(x-2.) for x in testsign001]
+	print testcoupling[testsign001.index(min(testsign001))]	
+	print "coupling max = "+str(coupling)
+
 	return s,b,s1/(b1**0.5)  
 
 def funcshisto():
@@ -278,6 +321,15 @@ def funcshisto():
 	histSgEphoDR.Write()
 
 def funcbhisto():
+	Bgchain = ROOT.TChain("Delphes")
+	Bgchain.Add(BgFile+"0_delphes.root")
+	# Create object of class ExRootTreeReader
+	BgtreeReader = ROOT.ExRootTreeReader(Bgchain)
+
+	# Get pointers to branches used in this analysis
+	BgbranchPhoton = BgtreeReader.UseBranch("Photon")
+	BgbranchTrack = BgtreeReader.UseBranch("Track")
+
 	histBgepho2epho1 = ROOT.TH1F("Bg_Epho2/Epho1", "Bg_Epho2/Epho1", 150, 0.0, 1.1)
 	histBgdeltar = ROOT.TH1F("Bg_DeltaR", "Bg_DeltaR", 100, 0., 10.)
 	histBgMALP = ROOT.TH1F("Bg_MALP", "Bg", 100, 0., 100.)
