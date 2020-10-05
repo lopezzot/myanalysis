@@ -78,7 +78,7 @@ global luminosity
 #[0.00010584473200797015, 0.00011195767438563123, 0.00012333718369766136, 0.00014287565957617757, 0.0001768077913388226, 0.00024087176728341438, 0.0003875681881371373, 0.0008997139223959913, 0.016127450112823835]
 
 #xsec10 = [0.0002380292, 0.0002127458, 0.0001752995, 0.0001306328, 8.530332e-05, 4.596179e-05, 1.775303e-05, 3.294275e-06]
-xsec_scanalp160_100_eta10 = 0.496069 #ab #from lorenzo/alp/lorenzo/xsectocyy.py
+xsec_scanalp160_80_eta10 = 0.92838 #ab #from lorenzo/alp/lorenzo/xsectocyy.py
 xsec_3abg160_eta10 = 1.2534e06 #ab #from polesell/work/alpbg/fcc3a/Events/3abf_90_1
 luminosity = 10.0 #ab^-1
 
@@ -137,7 +137,7 @@ def funcs(cutDR, cutEpho):
 		
 		Sg_DeltaR = threephotons_vec[ipalp1].DeltaR(threephotons_vec[ipalp2])
 		
-		if MALPcut < 1.5 and ((0.4<epho2epho1<0.5 and Sg_DeltaR<3.2) or (epho2epho1>0.5 and Sg_DeltaR<3.0)):
+		if MALPcut < 1.5 and ((0.2<epho2epho1<0.4 and Sg_DeltaR<3.2) or (epho2epho1>0.4 and Sg_DeltaR<2.4)):
 			s_counter = s_counter+1
 		
 	#print s_counter
@@ -205,7 +205,7 @@ def funcb(cutDR, cutEpho):
 		
 			Bg_DeltaR = threephotons_vec[ipalp1].DeltaR(threephotons_vec[ipalp2])
 		
-			if MALPcut < 1.5 and ((0.4<epho2epho1<0.5 and Bg_DeltaR<3.2) or (epho2epho1>0.5 and Bg_DeltaR<3.0)):
+			if MALPcut < 1.5 and ((0.2<epho2epho1<0.4 and Bg_DeltaR<3.2) or (epho2epho1>0.4 and Bg_DeltaR<2.4)):
 				b_counter = b_counter+1
 
 		print "bkg file "+str(filenumber)+", sum of events in sg: "+str(b_counter)
@@ -215,7 +215,7 @@ def funcb(cutDR, cutEpho):
 def funcssqrtb(cutDR, cutEpho):
 	s = funcs(cutDR, cutEpho)
 	b = funcb(cutDR, cutEpho)
-	s1 = s*xsec_scanalp160_100_eta10*luminosity/SgnumberOfEntries
+	s1 = s*xsec_scanalp160_80_eta10*luminosity/SgnumberOfEntries
 	b1 = b*xsec_3abg160_eta10 * luminosity/(BgnumberOfEntries*10)
 	print "out-> "+str(cutDR)+"  "+str(cutEpho)+"  "+str(s)+"  "+str(b)+"  "+str(s1)+"  "+str(b1)+"  "+str(s1/(b1**0.5))+"\n"
 	coupling = (((b1**0.5)*2*0.01**2)/s1)**0.5
