@@ -148,7 +148,7 @@ def funcs(cutDR, cutEpho):
 def funcb(cutDR, cutEpho):
 	b_counter = 0
 
-	for filenumber in range(0,10):
+	for filenumber in range(0,1000):
 		Bgchain = ROOT.TChain("Delphes")
 		print BgFile+str(filenumber)+"_delphes.root"
 		Bgchain.Add(BgFile+str(filenumber)+"_delphes.root")
@@ -219,7 +219,7 @@ def funcssqrtb(cutDR, cutEpho):
 	s = funcs(cutDR, cutEpho)
 	b = funcb(cutDR, cutEpho)
 	s1 = s*xsec_scanalp90_1_eta10*luminosity/SgnumberOfEntries
-	b1 = b*xsec_3abg90_eta10*luminosity/(BgnumberOfEntries*10)
+	b1 = b*xsec_3abg90_eta10*luminosity/(BgnumberOfEntries*1000)
 	print "out-> "+str(cutDR)+"  "+str(cutEpho)+"  "+str(s)+"  "+str(b)+"  "+str(s1)+"  "+str(b1)+"  "+str(s1/(b1**0.5))+"\n"
 	coupling = (((b1**0.5)*2*0.01**2)/s1)**0.5
 	print "coupling no systematics: "+str(coupling)
