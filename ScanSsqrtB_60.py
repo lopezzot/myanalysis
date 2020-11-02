@@ -10,6 +10,7 @@ import ROOT
 import includeme
 from array import array
 from ROOT import TGraph2D
+import numpy as np
 
 if len(sys.argv) < 3:
 	print " Usage: python examples/analysis.py inputBg.root inputSg.root output.root testmass"
@@ -86,6 +87,11 @@ histSgsqrtBEphoDR = ROOT.TH2F("Sg/sqrt(B)", "Sg/sqrt(B)", 100, 0.0, 2.0, 100, 0.
  
 def funcs(cutDR, cutEpho):
 	s_counter = 0
+
+	trainingset = []
+	traininglabels = []
+	evalset = []
+	evallabels = []
 	
 	# Loop over signal events
 	for entry in range(0, SgnumberOfEntries):
@@ -136,14 +142,38 @@ def funcs(cutDR, cutEpho):
 			
 		if MALPcut < 1.5 and epho2epho1>0.7:
 			s_counter = s_counter+1
+
+		if entry < SgnumberOfEntries/2:
+			trainingset.append([MALPcut,Sg_DeltaR,epho2epho1])
+			traininglabels.append([1])
+		else:
+			evalset.append([MALPcut,Sg_DeltaR,epho2epho1])
+			evallabels.append([1])
+
+
+	nptrainingset = np.zeros((len(trainingset),3))
+	nptraininglabels = np.zeros((len(traininglabels),1),np.int32)
+	for i in range(len(trainingset)):
+		nptrainingset[i]=trainingset[i]
+		nptraininglabels[i]=traininglabels[i]
+	npevalset = np.zeros((len(evalset),3))
+	npevallabels = np.zeros((len(evallabels),1),np.int32)
+	for i in range(len(evalset)):
+		npevalset[i]=evalset[i]
+		npevallabels[i]=evallabels[i]
 		
 	#print s_counter
-	return s_counter
+	return nptrainingset, nptraininglabels, npevalset, npevallabels, s_counter
 
 def funcb(cutDR, cutEpho):
 	b_counter = 0
 
-	for filenumber in range(0,1000):
+	trainingset = []
+	traininglabels = []
+	evalset = []
+	evallabels = []
+
+	for filenumber in range(0,10):
 		Bgchain = ROOT.TChain("Delphes")
 		print BgFile+str(filenumber)+"_delphes.root"
 		Bgchain.Add(BgFile+str(filenumber)+"_delphes.root")
@@ -205,16 +235,70 @@ def funcb(cutDR, cutEpho):
 			if MALPcut < 1.5 and epho2epho1>0.7:
 				b_counter = b_counter+1
 
+			if filenumber == 0:
+				trainingset.append([MALPcut,Bg_DeltaR,epho2epho1])
+				traininglabels.append([0])
+			else:
+				evalset.append([MALPcut,Bg_DeltaR,epho2epho1])
+				evallabels.append([0])
+
 		Bgchain.Delete()
 		print "bkg file "+str(filenumber)+", sum of events in sg: "+str(b_counter)
 
-	return b_counter
+	nptrainingset = np.zeros((len(trainingset),3))
+	nptraininglabels = np.zeros((len(traininglabels),1),np.int32)
+	for i in range(len(trainingset)):
+		nptrainingset[i]=trainingset[i]
+		nptraininglabels[i]=traininglabels[i]
+	npevalset = np.zeros((len(evalset),3))
+	npevallabels = np.zeros((len(evallabels),1),np.int32)
+	for i in range(len(evalset)):
+		npevalset[i]=evalset[i]
+		npevallabels[i]=evallabels[i]
+	return nptrainingset, nptraininglabels, npevalset, npevallabels, b_counter
 
 def funcssqrtb(cutDR, cutEpho):
-	s = funcs(cutDR, cutEpho)
-	b = funcb(cutDR, cutEpho)
+	model = includeme.build_model()
+	signaltset, signaltlabel, signaleset, signalelabels, s = funcs(cutDR, cutEpho)
+	bkgtset, bkgtlabel, bkgeset, bkgelabels, b = funcb(cutDR, cutEpho)
+	trainset = np.concatenate((signaltset,bkgtset))
+	trainlabel = np.concatenate((signaltlabel,bkgtlabel))
+	model.fit(trainset, trainlabel, epochs=10, verbose=1)
+	model.save("alpsca90_60")
+	#print "evaluate"
+	#test_loss_bkg, test_acc_bkg = model.evaluate(bkgeset, bkgelabels)
+	#test_loss_sig, test_acc_sig = model.evaluate(signaleset, signalelabels)
+	#print('test accuracy background: ',test_acc_bkg)
+	#print('test accuracy signal: ',test_acc_sig)
+	result_signal = model.predict(signaleset)
+	result_bkg = model.predict(bkgeset)
+	sml = 0
+	for x in result_signal:
+		if x > 0.999:
+			sml = sml+1
+	bml = 0
+	for x in result_bkg:
+		if x > 0.999:
+			bml = bml+1
+	s1ml = sml*xsec_scanalp90_60_eta10*luminosity/(SgnumberOfEntries/2)
+	b1ml = bml*xsec_3abg90_eta10*luminosity/(BgnumberOfEntries*9)
+	print "out ml-> "+str(cutDR)+"  "+str(cutEpho)+"  "+str(sml)+"  "+str(bml)+"  "+str(s1ml)+"  "+str(b1ml)+"  "+str(s1ml/(b1ml**0.5))+"\n"
+	couplingml = (((b1ml**0.5)*2*0.01**2)/s1ml)**0.5
+	print "coupling ml no systematics: "+str(couplingml)
+	testcoupling = []
+	testsign001 = []
+
+	for i in range(20000):
+		couplingml = couplingml+0.0001
+		observedml = b1ml+s1ml*couplingml**2/(0.01**2)
+		pull001ml = includeme.plotSignificance(observedml, b1ml, 0.001)		
+		testcoupling.append(couplingml)
+		testsign001.append(pull001ml)
+	testsign001 = [abs(x-2.) for x in testsign001]
+	print testcoupling[testsign001.index(min(testsign001))]	
+
 	s1 = s*xsec_scanalp90_60_eta10*luminosity/SgnumberOfEntries
-	b1 = b*xsec_3abg90_eta10*luminosity/(BgnumberOfEntries*1000)
+	b1 = b*xsec_3abg90_eta10*luminosity/(BgnumberOfEntries*10)
 	print "out-> "+str(cutDR)+"  "+str(cutEpho)+"  "+str(s)+"  "+str(b)+"  "+str(s1)+"  "+str(b1)+"  "+str(s1/(b1**0.5))+"\n"
 	coupling = (((b1**0.5)*2*0.01**2)/s1)**0.5
 	print "coupling no systematics: "+str(coupling)
