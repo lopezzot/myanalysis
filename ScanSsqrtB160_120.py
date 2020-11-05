@@ -255,9 +255,12 @@ def funcshisto():
 	histSgMALP = ROOT.TH1F("Sg_MALP", "Sg", 100, 0., 300.)
 	histSgMALPcut = ROOT.TH1F("Sg_MALPcut", "Sg", 100, 0., 50.)
 	histSgEphoDR = ROOT.TH2F("Sg", "Sg", 100, 0.0, 1.1, 100, 0., 6.)
-	histSgEphoMalp = ROOT.TH2F("Sg_2","Sg_2", 100, -4, 4, 100, -5, 5)
-	histSgEphoDR_afterMALPcut = ROOT.TH2F("Sg_afterMALPcut", "Sg_afterMALPcut", 100, 0.0, 1.1, 100, 0., 6.)
-
+	histSgEphoMalp = ROOT.TH2F("Sg_2","Sg_2", 240, -6, 6, 120, -6, 6)
+	histSgEphoDR_afterMALPcut = ROOT.TH2F("Sg_afterMALPcut", "Sg_afterMALPcut", 100, 0.4, 1.1, 100, 0., 7.)
+	histSgEphoMalp.GetXaxis().SetTitle("(E_{\gamma 3}-E_{\gamma})^2/\sigma_{E_{\gamma 3}}")
+	histSgEphoMalp.GetYaxis().SetTitle("(M_a-M)^2/\sigma_{Ma}^2")
+	histSgEphoDR_afterMALPcut.GetXaxis().SetTitle("E_{\gamma 1}/E_{\gamma 2}")
+	histSgEphoDR_afterMALPcut.GetYaxis().SetTitle("\Delta R_{\gamma 1 \gamma 2}")
 	# Loop over signal events
 	for entry in range(0, SgnumberOfEntries):
 		# Load selected branches with data from specified event
@@ -338,9 +341,12 @@ def funcbhisto():
 	histBgMALP = ROOT.TH1F("Bg_MALP", "Bg", 100, 0., 300.)
 	histBgMALPcut = ROOT.TH1F("Bg_MALPcut", "Bg", 100, 0., 50.)
 	histBgEphoDR = ROOT.TH2F("Bg", "Bg", 100, 0.00, 1.1, 100, 0., 6.)
-	histBgEphoMalp = ROOT.TH2F("Bg_2","Bg_2", 100, -70, 35, 100, -90, 60)
-	histBgEphoDR_afterMALPcut = ROOT.TH2F("Bg_afterMALPcut", "Bg_afterMALPcut", 100, 0.0, 1.1, 100, 0.0, 6.0)
-
+	histBgEphoMalp = ROOT.TH2F("Bg_2","Bg_2", 360, -150, 30, 160, -40, 40)
+	histBgEphoDR_afterMALPcut = ROOT.TH2F("Bg_afterMALPcut", "Bg_afterMALPcut", 100, 0.4, 1.1, 100, 0.0, 7.0)
+	histBgEphoMalp.GetXaxis().SetTitle("(E_{\gamma 3}-E_{\gamma})^2/\sigma_{E_{\gamma 3}}^2")
+	histBgEphoMalp.GetYaxis().SetTitle("(M_a-M)^2/\sigma_{Ma}^2")
+	histBgEphoDR_afterMALPcut.GetXaxis().SetTitle("E_{\gamma 1}/E_{\gamma 2}")
+	histBgEphoDR_afterMALPcut.GetYaxis().SetTitle("\Delta R_{\gamma 1 \gamma 2}")
 	# Loop over signal events
 	for entry in range(0, BgnumberOfEntries):
 		# Load selected branches with data from specified event
