@@ -134,7 +134,7 @@ def funcs(cutDR, cutEpho):
 		
 		Sg_DeltaR = threephotons_vec[ipalp1].DeltaR(threephotons_vec[ipalp2])
 			
-		if MALPcut < 1.5 and Sg_DeltaR < 2.5 and 1.2 < Sg_DeltaR and epho2epho1>0.2:
+		if MALPcut < 1.5 and Sg_DeltaR < 1.6 and epho2epho1>0.2:
 			s_counter = s_counter+1
 		
 	#print s_counter
@@ -202,7 +202,7 @@ def funcb(cutDR, cutEpho):
 		
 			Bg_DeltaR = threephotons_vec[ipalp1].DeltaR(threephotons_vec[ipalp2])
 		
-			if MALPcut < 1.5 and Bg_DeltaR < 2.5 and 1.2 < Bg_DeltaR and epho2epho1 > 0.2:
+			if MALPcut < 1.5 and Bg_DeltaR < 1.6 and epho2epho1 > 0.2:
 				b_counter = b_counter+1
 		
 		Bgchain.Delete()
